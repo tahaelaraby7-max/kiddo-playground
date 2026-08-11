@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Learn Quran - Kiddo Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  .quran-stage { max-width: 760px; }
+
+  .arabic {
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    direction: rtl;
+  }
+
+  /* ===== Surah picker ===== */
+  .surah-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .surah-card {
+    background: var(--white);
+    border: 3px solid var(--purple);
+    border-radius: 18px;
+    padding: 18px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .surah-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 16px var(--shadow);
+  }
+  .surah-card .ar-name {
+    font-family: 'Amiri', serif;
+    font-size: 1.6rem;
+    color: var(--purple);
+    margin-bottom: 4px;
+  }
+  .surah-card .en-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 1rem;
+  }
+  .surah-card .meaning {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 2px;
+  }
+  .surah-card .count-badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--yellow);
+    color: #6b5300;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  /* ===== Scene ===== */
+  .quran-scene {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10.5;
+    margin: 6px auto 18px;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px var(--shadow), inset 0 0 0 6px #fff;
+    background: #f2ede1;
+  }
+  .q-wall {
+    position: absolute;
+    inset: 0;
+    height: 62%;
+    background: linear-gradient(180deg, #eef4ef 0%, #dbe7dc 100%);
+  }
+  .q-floor {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 38%;
+    background: linear-gradient(180deg, #c9997a 0%, #b17f5e 100%);
+  }
+  .q-rug {
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    width: 76%;
+    height: 22%;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(90deg, #d1495a 0 6%, #b83a49 6% 12%);
+    border-radius: 14px;
+    box-shadow: 0 0 0 6px #7a2a35, 0 8px 12px rgba(0,0,0,0.25);
+  }
+  .q-window {
+    position: absolute;
+    top: 6%;
+    right: 8%;
+    width: 20%;
+    height: 42%;
+    background: linear-gradient(180deg, #2c3f63 0%, #4a6491 60%, #6f8bb8 100%);
+    border-radius: 50% 50% 8px 8px / 30% 30% 8px 8px;
+    border: 7px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .q-window .moon {
+    position: absolute;
+    top: 14%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34%;
+    aspect-ratio: 1;
+    background: #fff6d6;
+    border-radius: 50%;
+    box-shadow: -6px 0 0 -2px #2c3f63 inset;
+  }
+  .q-window .star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .q-shelf-wrap {
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    width: 26%;
+  }
+  .q-shelf {
+    height: 10px;
+    background: #8a5a34;
+    border-radius: 4px;
+    box-shadow: 0 3px 4px rgba(0,0,0,0.2);
+  }
+  .q-books {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+  }
+  .q-book {
+    width: 14%;
+    height: 24px;
+    border-radius: 2px;
+    margin-bottom: -2px;
+  }
+
+  .surah-banner {
+    position: absolute;
+    top: 8%;
+    left: 34%;
+    width: 32%;
+    background: #fff8dd;
+    border: 1px solid #e8dba3;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: rotate(-2deg);
+  }
+  .surah-banner .ar-name {
+    font-family: 'Amiri', serif;
+    font-size: 1.3rem;
+    color: #6b5300;
+  }
+  .surah-banner .progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .progress-dots .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #e0d3a0;
+    transition: background 0.2s ease;
+  }
+  .progress-dots .dot.done { background: var(--green); }
+  .progress-dots .dot.current { background: var(--orange); }
+
+  /* ===== Instructor character ===== */
+  .instructor {
+    position: absolute;
+    left: 4%;
+    bottom: 2%;
+    width: 34%;
+    height: 60%;
+    animation: bob 3s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  .instructor svg { width: 100%; height: 100%; display: block; }
+  .instructor.talking { animation: talk-pulse 0.5s ease-in-out infinite; }
+  .instructor.cheer { animation: cheer 0.7s ease; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2%); }
+  }
+  @keyframes talk-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes cheer {
+    0% { transform: scale(1) rotate(0); }
+    30% { transform: scale(1.1) rotate(-4deg); }
+    60% { transform: scale(1.1) rotate(4deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  /* ===== Ayah panel ===== */
+  .ayah-panel {
+    position: absolute;
+    right: 4%;
+    bottom: 4%;
+    width: 54%;
+    background: rgba(255,255,255,0.92);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    text-align: center;
+  }
+  .ayah-panel .ayah-text {
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    color: #3a2a1a;
+    line-height: 1.8;
+    min-height: 1.8em;
+  }
+  .ayah-panel .ayah-counter {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--purple);
+    margin-top: 4px;
+  }
+
+  .confetti-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 200;
+  }
+  .confetti-bit {
+    position: absolute;
+    top: 30%;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confetti-fall 1s ease-out forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(160px) rotate(300deg); opacity: 0; }
+  }
+
+  /* ===== Controls under scene ===== */
+  .quran-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 10px 0 4px;
+  }
+  .quran-controls .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .repeat-prompt {
+    text-align: center;
+    font-weight: 700;
+    color: var(--pink);
+    min-height: 1.4em;
+    margin: 6px 0;
+  }
+
+  /* ===== Completion screen ===== */
+  .complete-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .complete-screen .big-emoji {
+    font-size: 3.5rem;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🎈 Kiddo Playground</div>
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
+</header>
+
+<main class="game-page">
+  <h1>📖 Learn Quran</h1>
+  <p>Listen to Ustadh Ahmad recite each ayah, then repeat it out loud yourself!</p>
+
+  <div class="game-stage quran-stage">
+
+    <!-- ===== Screen 1: Surah picker ===== -->
+    <div id="pickerScreen">
+      <div class="stats"><div>Surahs completed: <span id="surahCount">0</span></div></div>
+      <div class="surah-grid" id="surahGrid"></div>
+    </div>
+
+    <!-- ===== Screen 2: Recitation ===== -->
+    <div id="recitationScreen" class="hidden">
+      <div class="quran-scene" id="quranScene">
+        <div class="q-wall">
+          <div class="q-window">
+            <div class="moon"></div>
+            <div class="star" style="top:20%; left:20%;"></div>
+            <div class="star" style="top:35%; left:70%;"></div>
+            <div class="star" style="top:60%; left:30%;"></div>
+          </div>
+          <div class="q-shelf-wrap">
+            <div class="q-books">
+              <div class="q-book" style="background:#c9524a"></div>
+              <div class="q-book" style="background:#4d96ff"></div>
+              <div class="q-book" style="background:#6bcb77"></div>
+              <div class="q-book" style="background:#ffa62b"></div>
+            </div>
+            <div class="q-shelf"></div>
+          </div>
+          <div class="surah-banner">
+            <div class="ar-name" id="banner-ar-name">—</div>
+            <div class="progress-dots" id="progressDots"></div>
+          </div>
+        </div>
+        <div class="q-floor"></div>
+        <div class="q-rug"></div>
+
+        <div class="instructor" id="instructor">
+          <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="250" rx="70" ry="10" fill="rgba(0,0,0,0.15)"/>
+            <!-- crossed-leg base -->
+            <path d="M30,240 Q100,200 170,240 Q170,255 100,255 Q30,255 30,240 Z" fill="#6f8f7a"/>
+            <!-- robe -->
+            <path d="M62,110 Q100,96 138,110 L158,225 Q100,246 42,225 Z" fill="#8fa998"/>
+            <path d="M85,120 h30 v90 h-30 z" fill="#eef1e6" opacity="0.5"/>
+            <!-- arms holding book -->
+            <path d="M65,130 Q60,175 85,190" stroke="#f0c39a" stroke-width="15" fill="none" stroke-linecap="round"/>
+            <path d="M135,130 Q140,175 115,190" stroke="#f0c39a" stroke-width="15" fill="none" stroke-linecap="round"/>
+            <!-- book -->
+            <rect x="78" y="182" width="44" height="30" rx="4" fill="#fff8ef" stroke="#d8cdb8" stroke-width="2"/>
+            <line x1="100" y1="184" x2="100" y2="210" stroke="#d8cdb8" stroke-width="2"/>
+            <!-- beard -->
+            <path d="M72,80 Q70,110 100,116 Q130,110 128,80 Q130,100 100,104 Q70,100 72,80 Z" fill="#847262"/>
+            <!-- head -->
+            <circle cx="100" cy="64" r="38" fill="#f0c39a"/>
+            <!-- cap -->
+            <path d="M66,50 Q66,18 100,18 Q134,18 134,50 Q100,38 66,50 Z" fill="#fff" stroke="#e7e0d3" stroke-width="2"/>
+            <!-- face -->
+            <circle cx="88" cy="62" r="4" fill="#3a2a1a"/>
+            <circle cx="112" cy="62" r="4" fill="#3a2a1a"/>
+            <path d="M84,58 h10 M106,58 h10" stroke="#3a2a1a" stroke-width="2" stroke-linecap="round"/>
+            <path d="M88,76 Q100,84 112,76" stroke="#6b4a2a" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="ayah-panel">
+          <div class="ayah-text arabic" id="ayahText">…</div>
+          <div class="ayah-counter" id="ayahCounter">Ayah 1 of 7</div>
+        </div>
+      </div>
+
+      <div class="repeat-prompt" id="repeatPrompt">&nbsp;</div>
+
+      <div class="quran-controls">
+        <button class="btn" id="listenBtn">🔊 Listen</button>
+        <button class="btn secondary" id="repeatedBtn" disabled>🎤 I repeated it! Next ➡</button>
+        <button class="btn secondary" id="backToListBtn">📚 Choose Another Surah</button>
+      </div>
+      <audio id="ayahAudio"></audio>
+    </div>
+
+    <!-- ===== Screen 3: Complete ===== -->
+    <div id="completeScreen" class="complete-screen">
+      <div class="big-emoji">🎉</div>
+      <h2 id="completeTitle">Great job!</h2>
+      <p id="completeSubtitle">You finished the surah!</p>
+      <div class="quran-controls">
+        <button class="btn" id="againBtn">🔁 Repeat This Surah</button>
+        <button class="btn secondary" id="pickAnotherBtn">📚 Choose Another Surah</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Made with 💜 for curious kids everywhere.
+</footer>
+
+<div class="confetti-layer" id="confettiLayer"></div>
+
+<script>
+// Arabic text verified against the Uthmani mushaf text (quran-uthmani edition).
+const SURAHS = {
+  1: {
+    englishName: 'Al-Fatiha',
+    arabicName: 'سُورَةُ ٱلْفَاتِحَةِ',
+    meaning: 'The Opening',
+    ayahs: [
+      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+      'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ',
+      'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+      'مَٰلِكِ يَوْمِ ٱلدِّينِ',
+      'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
+      'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ',
+      'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ'
+    ]
+  },
+  112: {
+    englishName: 'Al-Ikhlas',
+    arabicName: 'سُورَةُ ٱلْإِخْلَاصِ',
+    meaning: 'Sincerity',
+    ayahs: [
+      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ',
+      'ٱللَّهُ ٱلصَّمَدُ',
+      'لَمْ يَلِدْ وَلَمْ يُولَدْ',
+      'وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ'
+    ]
+  },
+  113: {
+    englishName: 'Al-Falaq',
+    arabicName: 'سُورَةُ ٱلْفَلَقِ',
+    meaning: 'The Dawn',
+    ayahs: [
+      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ',
+      'مِن شَرِّ مَا خَلَقَ',
+      'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ',
+      'وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ',
+      'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ'
+    ]
+  },
+  114: {
+    englishName: 'An-Nas',
+    arabicName: 'سُورَةُ ٱلنَّاسِ',
+    meaning: 'Mankind',
+    ayahs: [
+      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ',
+      'مَلِكِ ٱلنَّاسِ',
+      'إِلَٰهِ ٱلنَّاسِ',
+      'مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ',
+      'ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ',
+      'مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ'
+    ]
+  }
+};
+const SURAH_ORDER = [1, 112, 113, 114];
+
+let surahsCompleted = 0;
+let currentSurahId = null;
+let currentAyahIndex = 0;
+
+const pickerScreen = document.getElementById('pickerScreen');
+const recitationScreen = document.getElementById('recitationScreen');
+const completeScreen = document.getElementById('completeScreen');
+const surahGrid = document.getElementById('surahGrid');
+const ayahText = document.getElementById('ayahText');
+const ayahCounter = document.getElementById('ayahCounter');
+const bannerArName = document.getElementById('banner-ar-name');
+const progressDots = document.getElementById('progressDots');
+const listenBtn = document.getElementById('listenBtn');
+const repeatedBtn = document.getElementById('repeatedBtn');
+const repeatPrompt = document.getElementById('repeatPrompt');
+const ayahAudio = document.getElementById('ayahAudio');
+const instructor = document.getElementById('instructor');
+const confettiLayer = document.getElementById('confettiLayer');
+
+function buildSurahGrid() {
+  surahGrid.innerHTML = '';
+  SURAH_ORDER.forEach(id => {
+    const s = SURAHS[id];
+    const card = document.createElement('div');
+    card.className = 'surah-card';
+    card.innerHTML = `
+      <div class="ar-name">${s.arabicName}</div>
+      <div class="en-name">${s.englishName}</div>
+      <div class="meaning">"${s.meaning}"</div>
+      <div class="count-badge">${s.ayahs.length} ayahs</div>
+    `;
+    card.addEventListener('click', () => startSurah(id));
+    surahGrid.appendChild(card);
+  });
+}
+
+function audioUrl(surahId, ayahNum) {
+  const s = String(surahId).padStart(3, '0');
+  const a = String(ayahNum).padStart(3, '0');
+  return `https://everyayah.com/data/Husary_Muallim_128kbps/${s}${a}.mp3`;
+}
+
+function startSurah(id) {
+  currentSurahId = id;
+  currentAyahIndex = 0;
+  pickerScreen.classList.add('hidden');
+  completeScreen.style.display = 'none';
+  recitationScreen.classList.remove('hidden');
+  bannerArName.textContent = SURAHS[id].arabicName;
+  renderProgressDots();
+  renderAyah();
+}
+
+function renderProgressDots() {
+  const s = SURAHS[currentSurahId];
+  progressDots.innerHTML = '';
+  s.ayahs.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    if (i < currentAyahIndex) dot.classList.add('done');
+    else if (i === currentAyahIndex) dot.classList.add('current');
+    progressDots.appendChild(dot);
+  });
+}
+
+function renderAyah() {
+  const s = SURAHS[currentSurahId];
+  ayahText.textContent = s.ayahs[currentAyahIndex];
+  ayahCounter.textContent = `Ayah ${currentAyahIndex + 1} of ${s.ayahs.length}`;
+  repeatPrompt.textContent = ' ';
+  repeatedBtn.disabled = true;
+  renderProgressDots();
+}
+
+listenBtn.addEventListener('click', () => {
+  ayahAudio.src = audioUrl(currentSurahId, currentAyahIndex + 1);
+  ayahAudio.play().catch(() => {
+    repeatPrompt.textContent = "Couldn't load the audio — check your internet connection.";
+  });
+  instructor.classList.add('talking');
+  repeatPrompt.textContent = 'Listen carefully…';
+  repeatedBtn.disabled = true;
+});
+
+ayahAudio.addEventListener('ended', () => {
+  instructor.classList.remove('talking');
+  repeatPrompt.textContent = '🎤 Your turn! Repeat it out loud, then tap Next.';
+  repeatedBtn.disabled = false;
+});
+
+repeatedBtn.addEventListener('click', () => {
+  const s = SURAHS[currentSurahId];
+  if (currentAyahIndex < s.ayahs.length - 1) {
+    currentAyahIndex++;
+    renderAyah();
+  } else {
+    finishSurah();
+  }
+});
+
+document.getElementById('backToListBtn').addEventListener('click', showPicker);
+document.getElementById('pickAnotherBtn').addEventListener('click', showPicker);
+document.getElementById('againBtn').addEventListener('click', () => startSurah(currentSurahId));
+
+function showPicker() {
+  ayahAudio.pause();
+  recitationScreen.classList.add('hidden');
+  completeScreen.style.display = 'none';
+  pickerScreen.classList.remove('hidden');
+}
+
+function burstConfetti(layer) {
+  const colors = ['#ff6b9d', '#ffa62b', '#ffd93d', '#6bcb77', '#4d96ff', '#9b5de5'];
+  for (let i = 0; i < 20; i++) {
+    const bit = document.createElement('div');
+    bit.className = 'confetti-bit';
+    bit.style.left = (10 + Math.random() * 80) + '%';
+    bit.style.background = colors[Math.floor(Math.random() * colors.length)];
+    bit.style.animationDelay = (Math.random() * 0.2) + 's';
+    layer.appendChild(bit);
+    setTimeout(() => bit.remove(), 1300);
+  }
+}
+
+function finishSurah() {
+  surahsCompleted++;
+  document.getElementById('surahCount').textContent = surahsCompleted;
+  const s = SURAHS[currentSurahId];
+  document.getElementById('completeTitle').textContent = `Great job, you finished ${s.englishName}!`;
+  document.getElementById('completeSubtitle').textContent = `"${s.meaning}" — ${s.ayahs.length} ayahs completed. Mabrook! 🌟`;
+  instructor.classList.remove('talking');
+  instructor.classList.add('cheer');
+  setTimeout(() => instructor.classList.remove('cheer'), 700);
+  recitationScreen.classList.add('hidden');
+  completeScreen.style.display = 'block';
+  burstConfetti(confettiLayer);
+}
+
+buildSurahGrid();
+</script>
+
+</body>
+</html>
