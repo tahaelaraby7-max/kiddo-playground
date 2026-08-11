@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css" />
 <style>
-  .quran-stage { max-width: 760px; }
+  .quran-stage { max-width: 780px; }
 
   .arabic {
     font-family: 'Amiri', 'Traditional Arabic', serif;
@@ -18,15 +18,18 @@
   /* ===== Surah picker ===== */
   .surah-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
     margin: 20px 0;
+    max-height: 560px;
+    overflow-y: auto;
+    padding: 4px;
   }
   .surah-card {
     background: var(--white);
     border: 3px solid var(--purple);
-    border-radius: 18px;
-    padding: 18px 12px;
+    border-radius: 16px;
+    padding: 14px 10px;
     cursor: pointer;
     text-align: center;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -37,28 +40,29 @@
   }
   .surah-card .ar-name {
     font-family: 'Amiri', serif;
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     color: var(--purple);
     margin-bottom: 4px;
+    line-height: 1.4;
   }
   .surah-card .en-name {
     font-weight: 700;
     color: var(--text);
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   .surah-card .meaning {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: #888;
     margin-top: 2px;
   }
   .surah-card .count-badge {
     display: inline-block;
-    margin-top: 8px;
+    margin-top: 6px;
     background: var(--yellow);
     color: #6b5300;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    padding: 3px 10px;
+    padding: 2px 9px;
     border-radius: 999px;
   }
 
@@ -165,18 +169,21 @@
   }
   .surah-banner .ar-name {
     font-family: 'Amiri', serif;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     color: #6b5300;
   }
   .surah-banner .progress-dots {
     display: flex;
     justify-content: center;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 3px;
     margin-top: 4px;
+    max-height: 24px;
+    overflow: hidden;
   }
   .progress-dots .dot {
-    width: 9px;
-    height: 9px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #e0d3a0;
     transition: background 0.2s ease;
@@ -226,10 +233,12 @@
   }
   .ayah-panel .ayah-text {
     font-family: 'Amiri', serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #3a2a1a;
     line-height: 1.8;
     min-height: 1.8em;
+    max-height: 4.6em;
+    overflow-y: auto;
   }
   .ayah-panel .ayah-counter {
     font-size: 0.72rem;
@@ -266,10 +275,6 @@
     flex-wrap: wrap;
     margin: 10px 0 4px;
   }
-  .quran-controls .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
   .repeat-prompt {
     text-align: center;
     font-weight: 700;
@@ -302,7 +307,7 @@
 
 <main class="game-page">
   <h1>📖 Learn Quran</h1>
-  <p>Listen to Ustadh Ahmad recite each ayah, then repeat it out loud yourself!</p>
+  <p>Listen to Ustadh Ahmad recite each ayah — it plays through Juz Amma on its own, with a pause after every ayah so you can repeat it!</p>
 
   <div class="game-stage quran-stage">
 
@@ -342,24 +347,16 @@
         <div class="instructor" id="instructor">
           <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="100" cy="250" rx="70" ry="10" fill="rgba(0,0,0,0.15)"/>
-            <!-- crossed-leg base -->
             <path d="M30,240 Q100,200 170,240 Q170,255 100,255 Q30,255 30,240 Z" fill="#6f8f7a"/>
-            <!-- robe -->
             <path d="M62,110 Q100,96 138,110 L158,225 Q100,246 42,225 Z" fill="#8fa998"/>
             <path d="M85,120 h30 v90 h-30 z" fill="#eef1e6" opacity="0.5"/>
-            <!-- arms holding book -->
             <path d="M65,130 Q60,175 85,190" stroke="#f0c39a" stroke-width="15" fill="none" stroke-linecap="round"/>
             <path d="M135,130 Q140,175 115,190" stroke="#f0c39a" stroke-width="15" fill="none" stroke-linecap="round"/>
-            <!-- book -->
             <rect x="78" y="182" width="44" height="30" rx="4" fill="#fff8ef" stroke="#d8cdb8" stroke-width="2"/>
             <line x1="100" y1="184" x2="100" y2="210" stroke="#d8cdb8" stroke-width="2"/>
-            <!-- beard -->
             <path d="M72,80 Q70,110 100,116 Q130,110 128,80 Q130,100 100,104 Q70,100 72,80 Z" fill="#847262"/>
-            <!-- head -->
             <circle cx="100" cy="64" r="38" fill="#f0c39a"/>
-            <!-- cap -->
             <path d="M66,50 Q66,18 100,18 Q134,18 134,50 Q100,38 66,50 Z" fill="#fff" stroke="#e7e0d3" stroke-width="2"/>
-            <!-- face -->
             <circle cx="88" cy="62" r="4" fill="#3a2a1a"/>
             <circle cx="112" cy="62" r="4" fill="#3a2a1a"/>
             <path d="M84,58 h10 M106,58 h10" stroke="#3a2a1a" stroke-width="2" stroke-linecap="round"/>
@@ -376,8 +373,8 @@
       <div class="repeat-prompt" id="repeatPrompt">&nbsp;</div>
 
       <div class="quran-controls">
-        <button class="btn" id="listenBtn">🔊 Listen</button>
-        <button class="btn secondary" id="repeatedBtn" disabled>🎤 I repeated it! Next ➡</button>
+        <button class="btn" id="playPauseBtn">⏸ Pause</button>
+        <button class="btn secondary" id="replayBtn">🔁 Replay This Ayah</button>
         <button class="btn secondary" id="backToListBtn">📚 Choose Another Surah</button>
       </div>
       <audio id="ayahAudio"></audio>
@@ -407,64 +404,59 @@
 <div class="confetti-layer" id="confettiLayer"></div>
 
 <script>
-// Arabic text verified against the Uthmani mushaf text (quran-uthmani edition).
-const SURAHS = {
-  1: {
-    englishName: 'Al-Fatiha',
-    arabicName: 'سُورَةُ ٱلْفَاتِحَةِ',
-    meaning: 'The Opening',
-    ayahs: [
-      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-      'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ',
-      'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-      'مَٰلِكِ يَوْمِ ٱلدِّينِ',
-      'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
-      'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ',
-      'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ'
-    ]
-  },
-  112: {
-    englishName: 'Al-Ikhlas',
-    arabicName: 'سُورَةُ ٱلْإِخْلَاصِ',
-    meaning: 'Sincerity',
-    ayahs: [
-      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ',
-      'ٱللَّهُ ٱلصَّمَدُ',
-      'لَمْ يَلِدْ وَلَمْ يُولَدْ',
-      'وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ'
-    ]
-  },
-  113: {
-    englishName: 'Al-Falaq',
-    arabicName: 'سُورَةُ ٱلْفَلَقِ',
-    meaning: 'The Dawn',
-    ayahs: [
-      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ',
-      'مِن شَرِّ مَا خَلَقَ',
-      'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ',
-      'وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ',
-      'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ'
-    ]
-  },
-  114: {
-    englishName: 'An-Nas',
-    arabicName: 'سُورَةُ ٱلنَّاسِ',
-    meaning: 'Mankind',
-    ayahs: [
-      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ',
-      'مَلِكِ ٱلنَّاسِ',
-      'إِلَٰهِ ٱلنَّاسِ',
-      'مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ',
-      'ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ',
-      'مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ'
-    ]
-  }
-};
-const SURAH_ORDER = [1, 112, 113, 114];
+// Metadata verified against api.alquran.cloud (surah list endpoint). Ayah text for each
+// surah is fetched live from the same verified Uthmani-script API when a surah is opened,
+// so nothing here relies on hand-typed Quran text.
+const SURAH_META = [
+  {n:78,  ar:'سُورَةُ النَّبَإِ',       en:'An-Naba',        meaning:'The Announcement',        count:40},
+  {n:79,  ar:'سُورَةُ النَّازِعَاتِ',   en:"An-Naazi'aat",   meaning:'Those Who Drag Forth',    count:46},
+  {n:80,  ar:'سُورَةُ عَبَسَ',          en:'Abasa',          meaning:'He Frowned',              count:42},
+  {n:81,  ar:'سُورَةُ التَّكۡوِيرِ',    en:'At-Takwir',      meaning:'The Overthrowing',        count:29},
+  {n:82,  ar:'سُورَةُ الانفِطَارِ',     en:'Al-Infitaar',    meaning:'The Cleaving',            count:19},
+  {n:83,  ar:'سُورَةُ المُطَفِّفِينَ',  en:'Al-Mutaffifin',  meaning:'Defrauding',              count:36},
+  {n:84,  ar:'سُورَةُ الانشِقَاقِ',     en:'Al-Inshiqaaq',   meaning:'The Splitting Open',      count:25},
+  {n:85,  ar:'سُورَةُ البُرُوجِ',       en:'Al-Burooj',      meaning:'The Constellations',      count:22},
+  {n:86,  ar:'سُورَةُ الطَّارِقِ',      en:'At-Taariq',      meaning:'The Morning Star',        count:17},
+  {n:87,  ar:'سُورَةُ الأَعۡلَىٰ',      en:"Al-A'laa",       meaning:'The Most High',           count:19},
+  {n:88,  ar:'سُورَةُ الغَاشِيَةِ',     en:'Al-Ghaashiya',   meaning:'The Overwhelming',        count:26},
+  {n:89,  ar:'سُورَةُ الفَجۡرِ',        en:'Al-Fajr',        meaning:'The Dawn',                count:30},
+  {n:90,  ar:'سُورَةُ البَلَدِ',        en:'Al-Balad',       meaning:'The City',                count:20},
+  {n:91,  ar:'سُورَةُ الشَّمۡسِ',       en:'Ash-Shams',      meaning:'The Sun',                 count:15},
+  {n:92,  ar:'سُورَةُ اللَّيۡلِ',       en:'Al-Lail',        meaning:'The Night',               count:21},
+  {n:93,  ar:'سُورَةُ الضُّحَىٰ',       en:'Ad-Dhuhaa',      meaning:'The Morning Hours',       count:11},
+  {n:94,  ar:'سُورَةُ الشَّرۡحِ',       en:'Ash-Sharh',      meaning:'The Consolation',         count:8},
+  {n:95,  ar:'سُورَةُ التِّينِ',        en:'At-Tin',         meaning:'The Fig',                 count:8},
+  {n:96,  ar:'سُورَةُ العَلَقِ',        en:'Al-Alaq',        meaning:'The Clot',                count:19},
+  {n:97,  ar:'سُورَةُ القَدۡرِ',        en:'Al-Qadr',        meaning:'The Power',               count:5},
+  {n:98,  ar:'سُورَةُ البَيِّنَةِ',     en:'Al-Bayyina',     meaning:'The Evidence',            count:8},
+  {n:99,  ar:'سُورَةُ الزَّلۡزَلَةِ',   en:'Az-Zalzala',     meaning:'The Earthquake',          count:8},
+  {n:100, ar:'سُورَةُ العَادِيَاتِ',    en:'Al-Aadiyaat',    meaning:'The Chargers',            count:11},
+  {n:101, ar:'سُورَةُ القَارِعَةِ',     en:"Al-Qaari'a",     meaning:'The Calamity',            count:11},
+  {n:102, ar:'سُورَةُ التَّكَاثُرِ',    en:'At-Takaathur',   meaning:'Competition',             count:8},
+  {n:103, ar:'سُورَةُ العَصۡرِ',        en:'Al-Asr',         meaning:'The Declining Day',       count:3},
+  {n:104, ar:'سُورَةُ الهُمَزَةِ',      en:'Al-Humaza',      meaning:'The Traducer',            count:9},
+  {n:105, ar:'سُورَةُ الفِيلِ',         en:'Al-Fil',         meaning:'The Elephant',            count:5},
+  {n:106, ar:'سُورَةُ قُرَيۡشٍ',        en:'Quraish',        meaning:'Quraysh',                 count:4},
+  {n:107, ar:'سُورَةُ المَاعُونِ',      en:"Al-Maa'un",      meaning:'Almsgiving',              count:7},
+  {n:108, ar:'سُورَةُ الكَوۡثَرِ',      en:'Al-Kawthar',     meaning:'Abundance',               count:3},
+  {n:109, ar:'سُورَةُ الكَافِرُونَ',    en:'Al-Kaafiroon',   meaning:'The Disbelievers',        count:6},
+  {n:110, ar:'سُورَةُ النَّصۡرِ',       en:'An-Nasr',        meaning:'Divine Support',          count:3},
+  {n:111, ar:'سُورَةُ المَسَدِ',        en:'Al-Masad',       meaning:'The Palm Fibre',          count:5},
+  {n:112, ar:'سُورَةُ الإِخۡلَاصِ',     en:'Al-Ikhlaas',     meaning:'Sincerity',               count:4},
+  {n:113, ar:'سُورَةُ الفَلَقِ',        en:'Al-Falaq',       meaning:'The Dawn',                count:5},
+  {n:114, ar:'سُورَةُ النَّاسِ',        en:'An-Naas',        meaning:'Mankind',                 count:6}
+];
+
+const ayahCache = {}; // surahNumber -> array of ayah text strings
 
 let surahsCompleted = 0;
 let currentSurahId = null;
 let currentAyahIndex = 0;
+let currentAyahs = [];
+let playing = false;
+let pausedInGap = false;
+let gapTimer = null;
+const GAP_MS = 3200; // pause after each ayah so the child can repeat it
 
 const pickerScreen = document.getElementById('pickerScreen');
 const recitationScreen = document.getElementById('recitationScreen');
@@ -474,8 +466,8 @@ const ayahText = document.getElementById('ayahText');
 const ayahCounter = document.getElementById('ayahCounter');
 const bannerArName = document.getElementById('banner-ar-name');
 const progressDots = document.getElementById('progressDots');
-const listenBtn = document.getElementById('listenBtn');
-const repeatedBtn = document.getElementById('repeatedBtn');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const replayBtn = document.getElementById('replayBtn');
 const repeatPrompt = document.getElementById('repeatPrompt');
 const ayahAudio = document.getElementById('ayahAudio');
 const instructor = document.getElementById('instructor');
@@ -483,17 +475,16 @@ const confettiLayer = document.getElementById('confettiLayer');
 
 function buildSurahGrid() {
   surahGrid.innerHTML = '';
-  SURAH_ORDER.forEach(id => {
-    const s = SURAHS[id];
+  SURAH_META.forEach(s => {
     const card = document.createElement('div');
     card.className = 'surah-card';
     card.innerHTML = `
-      <div class="ar-name">${s.arabicName}</div>
-      <div class="en-name">${s.englishName}</div>
+      <div class="ar-name">${s.ar}</div>
+      <div class="en-name">${s.en}</div>
       <div class="meaning">"${s.meaning}"</div>
-      <div class="count-badge">${s.ayahs.length} ayahs</div>
+      <div class="count-badge">${s.count} ayahs</div>
     `;
-    card.addEventListener('click', () => startSurah(id));
+    card.addEventListener('click', () => startSurah(s.n));
     surahGrid.appendChild(card);
   });
 }
@@ -504,21 +495,51 @@ function audioUrl(surahId, ayahNum) {
   return `https://everyayah.com/data/Husary_Muallim_128kbps/${s}${a}.mp3`;
 }
 
-function startSurah(id) {
+async function loadAyahs(surahId) {
+  if (ayahCache[surahId]) return ayahCache[surahId];
+  const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}/quran-uthmani`);
+  if (!res.ok) throw new Error('bad response');
+  const json = await res.json();
+  const ayahs = json.data.ayahs.map(a => a.text);
+  ayahCache[surahId] = ayahs;
+  return ayahs;
+}
+
+async function startSurah(id) {
   currentSurahId = id;
   currentAyahIndex = 0;
+  playing = false;
+  pausedInGap = false;
+  if (gapTimer) { clearTimeout(gapTimer); gapTimer = null; }
+
   pickerScreen.classList.add('hidden');
   completeScreen.style.display = 'none';
   recitationScreen.classList.remove('hidden');
-  bannerArName.textContent = SURAHS[id].arabicName;
+
+  const meta = SURAH_META.find(s => s.n === id);
+  bannerArName.textContent = meta.ar;
+  ayahText.textContent = 'Loading…';
+  ayahCounter.textContent = `Ayah 1 of ${meta.count}`;
+  repeatPrompt.textContent = 'Getting the ayahs ready…';
+  progressDots.innerHTML = '';
+
+  try {
+    currentAyahs = await loadAyahs(id);
+  } catch (e) {
+    repeatPrompt.textContent = "Couldn't load this surah — check your internet connection.";
+    ayahText.textContent = '⚠️';
+    return;
+  }
+
   renderProgressDots();
-  renderAyah();
+  playing = true;
+  updatePlayButton();
+  playAyah(0);
 }
 
 function renderProgressDots() {
-  const s = SURAHS[currentSurahId];
   progressDots.innerHTML = '';
-  s.ayahs.forEach((_, i) => {
+  currentAyahs.forEach((_, i) => {
     const dot = document.createElement('div');
     dot.className = 'dot';
     if (i < currentAyahIndex) dot.classList.add('done');
@@ -527,39 +548,74 @@ function renderProgressDots() {
   });
 }
 
-function renderAyah() {
-  const s = SURAHS[currentSurahId];
-  ayahText.textContent = s.ayahs[currentAyahIndex];
-  ayahCounter.textContent = `Ayah ${currentAyahIndex + 1} of ${s.ayahs.length}`;
-  repeatPrompt.textContent = ' ';
-  repeatedBtn.disabled = true;
+function renderAyahText() {
+  ayahText.textContent = currentAyahs[currentAyahIndex];
+  ayahCounter.textContent = `Ayah ${currentAyahIndex + 1} of ${currentAyahs.length}`;
   renderProgressDots();
 }
 
-listenBtn.addEventListener('click', () => {
-  ayahAudio.src = audioUrl(currentSurahId, currentAyahIndex + 1);
-  ayahAudio.play().catch(() => {
-    repeatPrompt.textContent = "Couldn't load the audio — check your internet connection.";
-  });
+function playAyah(index) {
+  currentAyahIndex = index;
+  renderAyahText();
+  repeatPrompt.textContent = '🔊 Listen carefully…';
   instructor.classList.add('talking');
-  repeatPrompt.textContent = 'Listen carefully…';
-  repeatedBtn.disabled = true;
-});
+  ayahAudio.src = audioUrl(currentSurahId, index + 1);
+  ayahAudio.play().catch(() => {
+    instructor.classList.remove('talking');
+    repeatPrompt.textContent = "Couldn't play the audio — check your internet connection.";
+  });
+}
 
 ayahAudio.addEventListener('ended', () => {
   instructor.classList.remove('talking');
-  repeatPrompt.textContent = '🎤 Your turn! Repeat it out loud, then tap Next.';
-  repeatedBtn.disabled = false;
+  if (!playing) return;
+  if (currentAyahIndex >= currentAyahs.length - 1) {
+    finishSurah();
+    return;
+  }
+  repeatPrompt.textContent = '🎤 Now repeat it out loud!';
+  gapTimer = setTimeout(() => {
+    gapTimer = null;
+    playAyah(currentAyahIndex + 1);
+  }, GAP_MS);
 });
 
-repeatedBtn.addEventListener('click', () => {
-  const s = SURAHS[currentSurahId];
-  if (currentAyahIndex < s.ayahs.length - 1) {
-    currentAyahIndex++;
-    renderAyah();
+function updatePlayButton() {
+  playPauseBtn.textContent = playing ? '⏸ Pause' : '▶ Resume';
+}
+
+playPauseBtn.addEventListener('click', () => {
+  if (playing) {
+    playing = false;
+    updatePlayButton();
+    if (gapTimer) { clearTimeout(gapTimer); gapTimer = null; pausedInGap = true; }
+    if (!ayahAudio.paused) ayahAudio.pause();
+    instructor.classList.remove('talking');
   } else {
-    finishSurah();
+    playing = true;
+    updatePlayButton();
+    if (pausedInGap) {
+      pausedInGap = false;
+      repeatPrompt.textContent = '🎤 Now repeat it out loud!';
+      gapTimer = setTimeout(() => {
+        gapTimer = null;
+        playAyah(currentAyahIndex + 1);
+      }, 900);
+    } else if (ayahAudio.src) {
+      instructor.classList.add('talking');
+      ayahAudio.play().catch(() => {});
+    } else {
+      playAyah(currentAyahIndex);
+    }
   }
+});
+
+replayBtn.addEventListener('click', () => {
+  if (gapTimer) { clearTimeout(gapTimer); gapTimer = null; }
+  pausedInGap = false;
+  playing = true;
+  updatePlayButton();
+  playAyah(currentAyahIndex);
 });
 
 document.getElementById('backToListBtn').addEventListener('click', showPicker);
@@ -567,6 +623,8 @@ document.getElementById('pickAnotherBtn').addEventListener('click', showPicker);
 document.getElementById('againBtn').addEventListener('click', () => startSurah(currentSurahId));
 
 function showPicker() {
+  playing = false;
+  if (gapTimer) { clearTimeout(gapTimer); gapTimer = null; }
   ayahAudio.pause();
   recitationScreen.classList.add('hidden');
   completeScreen.style.display = 'none';
@@ -587,11 +645,12 @@ function burstConfetti(layer) {
 }
 
 function finishSurah() {
+  playing = false;
   surahsCompleted++;
   document.getElementById('surahCount').textContent = surahsCompleted;
-  const s = SURAHS[currentSurahId];
-  document.getElementById('completeTitle').textContent = `Great job, you finished ${s.englishName}!`;
-  document.getElementById('completeSubtitle').textContent = `"${s.meaning}" — ${s.ayahs.length} ayahs completed. Mabrook! 🌟`;
+  const meta = SURAH_META.find(s => s.n === currentSurahId);
+  document.getElementById('completeTitle').textContent = `Great job, you finished ${meta.en}!`;
+  document.getElementById('completeSubtitle').textContent = `"${meta.meaning}" — ${currentAyahs.length} ayahs completed. Mabrook! 🌟`;
   instructor.classList.remove('talking');
   instructor.classList.add('cheer');
   setTimeout(() => instructor.classList.remove('cheer'), 700);
