@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memory Match - Kiddo Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .card {
+    aspect-ratio: 1 / 1;
+    background: var(--purple);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .card.flipped, .card.matched {
+    background: var(--white);
+    border: 3px solid var(--yellow);
+    transform: rotateY(0deg);
+  }
+  .card.matched {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .win-msg {
+    font-size: 1.4rem;
+    color: var(--green);
+    font-weight: 800;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🎈 Kiddo Playground</div>
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
+</header>
+
+<main class="game-page">
+  <h1>🧠 Memory Match</h1>
+  <p>Find all the matching pairs in as few moves as possible!</p>
+
+  <div class="game-stage">
+    <div class="stats">
+      <div>Moves: <span id="moves">0</span></div>
+      <div>Matches: <span id="matches">0</span> / 8</div>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+    <div class="win-msg" id="winMsg" style="display:none;">🎉 You matched them all! 🎉</div>
+    <div class="controls">
+      <button class="btn" id="restartBtn">Restart</button>
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Made with 💜 for curious kids everywhere.
+</footer>
+
+<script>
+const EMOJIS = ['🐶','🐱','🐸','🦁','🐵','🦊','🐼','🐧'];
+let cards = [];
+let flipped = [];
+let matchedCount = 0;
+let moves = 0;
+let lock = false;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function init() {
+  cards = shuffle([...EMOJIS, ...EMOJIS]);
+  flipped = [];
+  matchedCount = 0;
+  moves = 0;
+  lock = false;
+  document.getElementById('moves').textContent = 0;
+  document.getElementById('matches').textContent = 0;
+  document.getElementById('winMsg').style.display = 'none';
+
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  cards.forEach((emoji, idx) => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.index = idx;
+    el.addEventListener('click', () => flipCard(idx, el));
+    grid.appendChild(el);
+  });
+}
+
+function flipCard(idx, el) {
+  if (lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+  el.classList.add('flipped');
+  el.textContent = cards[idx];
+  flipped.push({ idx, el });
+
+  if (flipped.length === 2) {
+    moves++;
+    document.getElementById('moves').textContent = moves;
+    lock = true;
+    const [a, b] = flipped;
+    if (cards[a.idx] === cards[b.idx]) {
+      a.el.classList.add('matched');
+      b.el.classList.add('matched');
+      matchedCount++;
+      document.getElementById('matches').textContent = matchedCount;
+      flipped = [];
+      lock = false;
+      if (matchedCount === EMOJIS.length) {
+        document.getElementById('winMsg').style.display = 'block';
+      }
+    } else {
+      setTimeout(() => {
+        a.el.classList.remove('flipped');
+        b.el.classList.remove('flipped');
+        a.el.textContent = '';
+        b.el.textContent = '';
+        flipped = [];
+        lock = false;
+      }, 800);
+    }
+  }
+}
+
+document.getElementById('restartBtn').addEventListener('click', init);
+init();
+</script>
+
+</body>
+</html>

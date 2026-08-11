@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tic-Tac-Toe - Kiddo Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  .ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .cell {
+    aspect-ratio: 1 / 1;
+    background: var(--bg);
+    border: 3px solid var(--purple);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    cursor: pointer;
+    color: var(--pink);
+  }
+  .cell.o { color: var(--blue); }
+  .status-msg {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 14px 0;
+    color: var(--purple);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🎈 Kiddo Playground</div>
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
+</header>
+
+<main class="game-page">
+  <h1>❌⭕ Tic-Tac-Toe</h1>
+  <p>Take turns with a friend. First to get 3 in a row wins!</p>
+
+  <div class="game-stage">
+    <div class="status-msg" id="statusMsg">Player X's turn</div>
+    <div class="ttt-grid" id="tttGrid"></div>
+    <div class="controls">
+      <button class="btn" id="restartBtn">Restart</button>
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Made with 💜 for curious kids everywhere.
+</footer>
+
+<script>
+let board = Array(9).fill('');
+let currentPlayer = 'X';
+let gameOver = false;
+
+const WIN_LINES = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function init() {
+  board = Array(9).fill('');
+  currentPlayer = 'X';
+  gameOver = false;
+  document.getElementById('statusMsg').textContent = "Player X's turn";
+  const grid = document.getElementById('tttGrid');
+  grid.innerHTML = '';
+  board.forEach((_, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.index = idx;
+    cell.addEventListener('click', () => makeMove(idx, cell));
+    grid.appendChild(cell);
+  });
+}
+
+function makeMove(idx, cellEl) {
+  if (gameOver || board[idx]) return;
+  board[idx] = currentPlayer;
+  cellEl.textContent = currentPlayer;
+  cellEl.classList.add(currentPlayer.toLowerCase());
+
+  const winner = checkWinner();
+  if (winner) {
+    document.getElementById('statusMsg').textContent = `🎉 Player ${winner} wins!`;
+    gameOver = true;
+    return;
+  }
+  if (board.every(c => c)) {
+    document.getElementById('statusMsg').textContent = "It's a tie! 🤝";
+    gameOver = true;
+    return;
+  }
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  document.getElementById('statusMsg').textContent = `Player ${currentPlayer}'s turn`;
+}
+
+function checkWinner() {
+  for (const [a,b,c] of WIN_LINES) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  return null;
+}
+
+document.getElementById('restartBtn').addEventListener('click', init);
+init();
+</script>
+
+</body>
+</html>
