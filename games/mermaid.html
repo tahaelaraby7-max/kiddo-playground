@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mermaid Adventure - Kiddo Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  .mermaid-preview {
+    font-size: 6rem;
+    text-align: center;
+    margin: 10px auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+  }
+  .swatch-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px auto 20px;
+  }
+  .swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.15s ease;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.selected { border-color: var(--purple); }
+  .option-label {
+    font-weight: 700;
+    color: var(--purple);
+    margin-top: 14px;
+  }
+  .accessory-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 10px auto;
+  }
+  .accessory-row button {
+    font-size: 1.8rem;
+    background: var(--white);
+    border: 3px solid var(--blue);
+    border-radius: 12px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  .accessory-row button.selected {
+    background: var(--yellow);
+    border-color: var(--orange);
+  }
+
+  /* ocean scene */
+  .ocean {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 380px;
+    margin: 10px auto;
+    background: linear-gradient(180deg, #4d96ff 0%, #1e5fb0 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    display: none;
+  }
+  .ocean.active { display: block; }
+  .swim-mermaid {
+    position: absolute;
+    font-size: 2.4rem;
+    transition: left 0.08s linear, top 0.08s linear;
+    user-select: none;
+  }
+  .pearl, .jelly {
+    position: absolute;
+    font-size: 1.8rem;
+    user-select: none;
+  }
+  .ocean-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🎈 Kiddo Playground</div>
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
+</header>
+
+<main class="game-page">
+  <h1>🧜‍♀️ Mermaid Adventure</h1>
+  <p>Design your mermaid, then swim around collecting pearls!</p>
+
+  <div class="game-stage" id="customizeStage">
+    <div class="mermaid-preview" id="mermaidPreview">🧜‍♀️</div>
+
+    <div class="option-label">Tail Color</div>
+    <div class="swatch-row" id="tailSwatches"></div>
+
+    <div class="option-label">Hair Color</div>
+    <div class="swatch-row" id="hairSwatches"></div>
+
+    <div class="option-label">Accessory</div>
+    <div class="accessory-row" id="accessoryRow">
+      <button data-acc="">None</button>
+      <button data-acc="👑">👑 Crown</button>
+      <button data-acc="📿">📿 Pearls</button>
+      <button data-acc="🌸">🌸 Flower</button>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="diveBtn">Dive In! 🌊</button>
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+  </div>
+
+  <div class="game-stage" id="swimStage" style="display:none;">
+    <div class="ocean-stats">
+      <div>Pearls: <span id="pearlScore">0</span></div>
+      <div>Time: <span id="swimTime">30</span>s</div>
+    </div>
+    <div class="ocean" id="ocean"></div>
+    <div class="controls">
+      <button class="btn" id="startSwimBtn">Start Swimming</button>
+      <button class="btn secondary" id="backToCustomizeBtn">Redesign Mermaid</button>
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+    <p style="color:#777;">Use arrow keys (or swipe on mobile) to move and collect pearls 🫧 — avoid the jellyfish!</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Made with 💜 for curious kids everywhere.
+</footer>
+
+<script>
+const TAIL_COLORS = ['#ff6b9d', '#4d96ff', '#6bcB77', '#9b5de5', '#ffd93d', '#ffa62b'];
+const HAIR_COLORS = ['#3d2b1f', '#ffd700', '#ff6b9d', '#7a4fff', '#ff4444'];
+
+let tailColor = TAIL_COLORS[0];
+let hairColor = HAIR_COLORS[0];
+let accessory = '';
+
+const preview = document.getElementById('mermaidPreview');
+
+function buildSwatches(container, colors, onPick, initial) {
+  colors.forEach((c, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (c === initial ? ' selected' : '');
+    sw.style.background = c;
+    sw.addEventListener('click', () => {
+      container.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      onPick(c);
+    });
+    container.appendChild(sw);
+  });
+}
+
+buildSwatches(document.getElementById('tailSwatches'), TAIL_COLORS, c => { tailColor = c; updatePreview(); }, tailColor);
+buildSwatches(document.getElementById('hairSwatches'), HAIR_COLORS, c => { hairColor = c; updatePreview(); }, hairColor);
+
+document.querySelectorAll('#accessoryRow button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#accessoryRow button').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    accessory = btn.dataset.acc;
+    updatePreview();
+  });
+});
+document.querySelector('#accessoryRow button').classList.add('selected');
+
+function updatePreview() {
+  preview.innerHTML = `<span style="filter: drop-shadow(0 0 0 ${tailColor}); color:${tailColor};">🧜‍♀️</span> ${accessory}`;
+  preview.style.color = tailColor;
+}
+updatePreview();
+
+document.getElementById('diveBtn').addEventListener('click', () => {
+  document.getElementById('customizeStage').style.display = 'none';
+  document.getElementById('swimStage').style.display = 'block';
+});
+document.getElementById('backToCustomizeBtn').addEventListener('click', () => {
+  document.getElementById('swimStage').style.display = 'none';
+  document.getElementById('customizeStage').style.display = 'block';
+  stopSwim();
+});
+
+// === Swim mini-game ===
+const ocean = document.getElementById('ocean');
+let mermaidEl = null;
+let pos = { x: 50, y: 170 };
+const speed = 14;
+let keys = {};
+let pearlScore = 0;
+let timeLeft = 30;
+let gameActive = false;
+let moveTimer = null;
+let countdownTimer = null;
+let spawnTimer = null;
+
+function stopSwim() {
+  gameActive = false;
+  clearInterval(moveTimer);
+  clearInterval(countdownTimer);
+  clearInterval(spawnTimer);
+  ocean.classList.remove('active');
+  ocean.innerHTML = '';
+}
+
+document.getElementById('startSwimBtn').addEventListener('click', startSwim);
+
+function startSwim() {
+  stopSwim();
+  ocean.classList.add('active');
+  pearlScore = 0;
+  timeLeft = 30;
+  document.getElementById('pearlScore').textContent = 0;
+  document.getElementById('swimTime').textContent = 30;
+  pos = { x: 20, y: 170 };
+
+  mermaidEl = document.createElement('div');
+  mermaidEl.className = 'swim-mermaid';
+  mermaidEl.innerHTML = `<span style="color:${tailColor};">🧜‍♀️</span>${accessory}`;
+  ocean.appendChild(mermaidEl);
+  renderMermaid();
+
+  gameActive = true;
+  moveTimer = setInterval(moveLoop, 40);
+  countdownTimer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('swimTime').textContent = timeLeft;
+    if (timeLeft <= 0) endSwim();
+  }, 1000);
+  spawnTimer = setInterval(spawnItem, 900);
+  spawnItem();
+  spawnItem();
+}
+
+function renderMermaid() {
+  mermaidEl.style.left = pos.x + 'px';
+  mermaidEl.style.top = pos.y + 'px';
+}
+
+function moveLoop() {
+  if (!gameActive) return;
+  const bounds = ocean.getBoundingClientRect();
+  const maxX = ocean.clientWidth - 40;
+  const maxY = ocean.clientHeight - 40;
+  if (keys['ArrowUp']) pos.y -= speed;
+  if (keys['ArrowDown']) pos.y += speed;
+  if (keys['ArrowLeft']) pos.x -= speed;
+  if (keys['ArrowRight']) pos.x += speed;
+  pos.x = Math.max(0, Math.min(maxX, pos.x));
+  pos.y = Math.max(0, Math.min(maxY, pos.y));
+  renderMermaid();
+  checkCollisions();
+}
+
+function spawnItem() {
+  if (!gameActive) return;
+  const isJelly = Math.random() < 0.35;
+  const el = document.createElement('div');
+  el.className = isJelly ? 'jelly' : 'pearl';
+  el.textContent = isJelly ? '🪼' : '🫧';
+  const maxX = ocean.clientWidth - 30;
+  const maxY = ocean.clientHeight - 30;
+  el.style.left = (Math.random() * maxX) + 'px';
+  el.style.top = (Math.random() * maxY) + 'px';
+  ocean.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function checkCollisions() {
+  const mRect = mermaidEl.getBoundingClientRect();
+  document.querySelectorAll('.pearl, .jelly').forEach(item => {
+    const r = item.getBoundingClientRect();
+    const overlap = !(mRect.right < r.left || mRect.left > r.right || mRect.bottom < r.top || mRect.top > r.bottom);
+    if (overlap) {
+      if (item.classList.contains('pearl')) {
+        pearlScore++;
+        document.getElementById('pearlScore').textContent = pearlScore;
+      } else {
+        pearlScore = Math.max(0, pearlScore - 1);
+        document.getElementById('pearlScore').textContent = pearlScore;
+      }
+      item.remove();
+    }
+  });
+}
+
+function endSwim() {
+  gameActive = false;
+  clearInterval(moveTimer);
+  clearInterval(countdownTimer);
+  clearInterval(spawnTimer);
+  setTimeout(() => alert(`Time's up! You collected ${pearlScore} pearls! 🎉`), 100);
+}
+
+document.addEventListener('keydown', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+    e.preventDefault();
+    keys[e.key] = true;
+  }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+// simple swipe support
+let touchStartX = null, touchStartY = null;
+ocean.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+ocean.addEventListener('touchmove', e => {
+  if (touchStartX === null || !gameActive) return;
+  const dx = e.touches[0].clientX - touchStartX;
+  const dy = e.touches[0].clientY - touchStartY;
+  pos.x = Math.max(0, Math.min(ocean.clientWidth - 40, pos.x + dx * 0.2));
+  pos.y = Math.max(0, Math.min(ocean.clientHeight - 40, pos.y + dy * 0.2));
+  renderMermaid();
+  checkCollisions();
+});
+</script>
+
+</body>
+</html>

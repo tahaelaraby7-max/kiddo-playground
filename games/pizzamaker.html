@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pizza Maker - Kiddo Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  .order-ticket {
+    background: var(--yellow);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-weight: 700;
+    margin: 10px auto;
+    max-width: 420px;
+    color: #5c4400;
+  }
+  .pizza-area {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: #f3d9a4;
+    border: 10px solid #d9a441;
+    box-shadow: 0 6px 16px var(--shadow);
+    transition: filter 0.6s ease;
+    overflow: hidden;
+  }
+  .pizza-area.no-dough {
+    background: repeating-linear-gradient(45deg, #eee, #eee 10px, #f7f7f7 10px, #f7f7f7 20px);
+    border-color: #ccc;
+  }
+  .pizza-area.baked {
+    filter: brightness(0.9) saturate(1.2) sepia(0.15);
+  }
+  .sauce-layer, .cheese-layer {
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .sauce-layer { background: #d1372f; }
+  .cheese-layer { background: #ffe082; }
+  .sauce-layer.on, .cheese-layer.on { opacity: 1; }
+  .topping {
+    position: absolute;
+    font-size: 1.6rem;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .ingredient-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 560px;
+    margin: 16px auto;
+  }
+  .ingredient-btn {
+    background: var(--white);
+    border: 3px solid var(--purple);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 64px;
+    transition: transform 0.1s ease;
+  }
+  .ingredient-btn:hover { transform: scale(1.08); }
+  .ingredient-btn span.label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--purple);
+  }
+  .speak-bubble {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -20px);
+    background: var(--white);
+    border: 4px solid var(--pink);
+    border-radius: 16px;
+    padding: 14px 26px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--pink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 50;
+  }
+  .speak-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .oven-progress {
+    width: 260px;
+    height: 18px;
+    background: #eee;
+    border-radius: 999px;
+    margin: 10px auto;
+    overflow: hidden;
+    display: none;
+  }
+  .oven-progress .bar {
+    height: 100%;
+    width: 0%;
+    background: var(--orange);
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🎈 Kiddo Playground</div>
+  <nav>
+    <a href="../index.html">Home</a>
+  </nav>
+</header>
+
+<main class="game-page">
+  <h1>🍕 Pizza Maker</h1>
+  <p>Build a pizza step by step — click an ingredient to hear its name in English!</p>
+
+  <div class="game-stage">
+    <div class="order-ticket" id="orderTicket">Order: Loading...</div>
+    <div class="stats">
+      <div>Pizzas made: <span id="pizzaCount">0</span></div>
+    </div>
+
+    <div class="pizza-area no-dough" id="pizzaArea">
+      <div class="sauce-layer" id="sauceLayer"></div>
+      <div class="cheese-layer" id="cheeseLayer"></div>
+    </div>
+
+    <div class="oven-progress" id="ovenProgress"><div class="bar" id="ovenBar"></div></div>
+
+    <div class="ingredient-bar">
+      <button class="ingredient-btn" data-type="dough" data-word="dough">🫓<span class="label">Dough</span></button>
+      <button class="ingredient-btn" data-type="sauce" data-word="sauce">🍅<span class="label">Sauce</span></button>
+      <button class="ingredient-btn" data-type="cheese" data-word="cheese">🧀<span class="label">Cheese</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="pepperoni" data-emoji="🍕">🔴<span class="label">Pepperoni</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="mushroom" data-emoji="🍄">🍄<span class="label">Mushroom</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="pepper" data-emoji="🫑">🫑<span class="label">Pepper</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="olive" data-emoji="⚫">⚫<span class="label">Olive</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="onion" data-emoji="🧅">🧅<span class="label">Onion</span></button>
+      <button class="ingredient-btn" data-type="topping" data-word="pineapple" data-emoji="🍍">🍍<span class="label">Pineapple</span></button>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="ovenBtn">Put in Oven 🔥</button>
+      <button class="btn secondary" id="serveBtn">Serve Pizza 🍽️</button>
+      <button class="btn" id="restartBtn">New Pizza</button>
+      <a class="btn secondary" href="../index.html">Back Home</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Made with 💜 for curious kids everywhere.
+</footer>
+
+<div class="speak-bubble" id="speakBubble"></div>
+
+<script>
+const TOPPING_WORDS = ['pepperoni','mushroom','pepper','olive','onion','pineapple'];
+let hasDough = false;
+let hasSauce = false;
+let hasCheese = false;
+let baked = false;
+let toppingsAdded = new Set();
+let pizzaCount = 0;
+let currentOrder = [];
+
+const pizzaArea = document.getElementById('pizzaArea');
+const sauceLayer = document.getElementById('sauceLayer');
+const cheeseLayer = document.getElementById('cheeseLayer');
+const speakBubble = document.getElementById('speakBubble');
+const ovenProgress = document.getElementById('ovenProgress');
+const ovenBar = document.getElementById('ovenBar');
+
+function speakWord(word) {
+  speakBubble.textContent = word;
+  speakBubble.classList.add('show');
+  setTimeout(() => speakBubble.classList.remove('show'), 1100);
+  if ('speechSynthesis' in window) {
+    const utter = new SpeechSynthesisUtterance(word);
+    utter.rate = 0.85;
+    utter.lang = 'en-US';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+}
+
+function newOrder() {
+  const shuffled = [...TOPPING_WORDS].sort(() => Math.random() - 0.5);
+  currentOrder = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+  document.getElementById('orderTicket').textContent =
+    'Order: pizza with ' + currentOrder.join(', ');
+}
+
+function addTopping(word, emoji) {
+  if (!hasDough || baked) return;
+  toppingsAdded.add(word);
+  for (let i = 0; i < 3; i++) {
+    const el = document.createElement('div');
+    el.className = 'topping';
+    el.textContent = emoji;
+    const angle = Math.random() * 2 * Math.PI;
+    const radius = Math.random() * 110;
+    const x = 160 + radius * Math.cos(angle);
+    const y = 160 + radius * Math.sin(angle);
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    pizzaArea.appendChild(el);
+  }
+}
+
+document.querySelectorAll('.ingredient-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.type;
+    const word = btn.dataset.word;
+    speakWord(word);
+    if (baked) return;
+
+    if (type === 'dough') {
+      hasDough = true;
+      pizzaArea.classList.remove('no-dough');
+    } else if (type === 'sauce') {
+      if (!hasDough) return;
+      hasSauce = true;
+      sauceLayer.classList.add('on');
+    } else if (type === 'cheese') {
+      if (!hasDough) return;
+      hasCheese = true;
+      cheeseLayer.classList.add('on');
+    } else if (type === 'topping') {
+      addTopping(word, btn.dataset.emoji);
+    }
+  });
+});
+
+document.getElementById('ovenBtn').addEventListener('click', () => {
+  if (!hasDough || baked) return;
+  ovenProgress.style.display = 'block';
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct += 4;
+    ovenBar.style.width = pct + '%';
+    if (pct >= 100) {
+      clearInterval(iv);
+      baked = true;
+      pizzaArea.classList.add('baked');
+      speakWord('yummy');
+    }
+  }, 80);
+});
+
+document.getElementById('serveBtn').addEventListener('click', () => {
+  if (!baked) {
+    alert('Bake the pizza first! 🔥');
+    return;
+  }
+  const missing = currentOrder.filter(t => !toppingsAdded.has(t));
+  if (missing.length === 0) {
+    pizzaCount++;
+    document.getElementById('pizzaCount').textContent = pizzaCount;
+    alert('🎉 Perfect pizza! Order complete!');
+  } else {
+    alert('Hmm, missing: ' + missing.join(', ') + ' — try again!');
+  }
+});
+
+document.getElementById('restartBtn').addEventListener('click', resetPizza);
+
+function resetPizza() {
+  hasDough = false;
+  hasSauce = false;
+  hasCheese = false;
+  baked = false;
+  toppingsAdded = new Set();
+  pizzaArea.classList.add('no-dough');
+  pizzaArea.classList.remove('baked');
+  sauceLayer.classList.remove('on');
+  cheeseLayer.classList.remove('on');
+  ovenProgress.style.display = 'none';
+  ovenBar.style.width = '0%';
+  document.querySelectorAll('.topping').forEach(t => t.remove());
+  newOrder();
+}
+
+newOrder();
+</script>
+
+</body>
+</html>
